@@ -1,0 +1,32 @@
+{
+  "name": "synccanvas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SyncCanvas - real-time collaborative digital whiteboard (Next.js + Node.js + Socket.io)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "build:packages": "npm run build -w @synccanvas/shared && npm run build -w @synccanvas/db",
+    "dev": "npm run build:packages && npm run dev:apps",
+    "dev:local": "npm run build:packages && node scripts/prepare-local-db.mjs && pglite-server --db=./.data/pglite --port=5433 -m 20 --run \"node scripts/dev-local-run.mjs\" --include-database-url",
+    "dev:apps": "concurrently -k -n server,client -c magenta,cyan \"npm run dev -w @synccanvas/server\" \"npm run dev -w @synccanvas/client\"",
+    "build": "npm run build:packages && npm run build -w @synccanvas/server && npm run build -w @synccanvas/client",
+    "start": "concurrently -k -n server,client -c magenta,cyan \"npm run start -w @synccanvas/server\" \"npm run start -w @synccanvas/client\"",
+    "typecheck": "npm run typecheck -w @synccanvas/shared && npm run typecheck -w @synccanvas/db && npm run typecheck -w @synccanvas/server && npm run typecheck -w @synccanvas/client",
+    "db:generate": "npm run db:generate -w @synccanvas/db",
+    "db:migrate": "npm run db:migrate -w @synccanvas/db",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@electric-sql/pglite-socket": "^0.2.14",
+    "concurrently": "^9.1.2",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}
